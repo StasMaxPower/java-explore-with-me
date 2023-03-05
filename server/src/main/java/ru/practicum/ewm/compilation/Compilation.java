@@ -24,8 +24,8 @@ public class Compilation {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "comp_events",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "comp_id"))
+            joinColumns = @JoinColumn(name = "comp_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
     private Set<Event> events;
 
 

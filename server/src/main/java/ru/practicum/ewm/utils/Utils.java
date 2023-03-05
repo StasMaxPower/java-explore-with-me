@@ -37,11 +37,15 @@ public class Utils {
         return date.format(formatter);
     }
 
-    public User mapToUser(int value){
+    public User mapToUser(int value) {
+        if (value == 0)
+            return null;
         return userRepository.findById(value).orElseThrow();
     }
 
-    public Event mapToEvent(int value){
+    public Event mapToEvent(int value) {
+        if (value == 0)
+            return null;
         return eventRepository.findById(value).orElseThrow();
     }
 }

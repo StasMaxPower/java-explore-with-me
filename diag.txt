@@ -51,6 +51,14 @@ Table Comp_events {
     comp_id BIGINT
     event_id BIGINT
     }
+    
+    Table Comments{
+    id BIGINT
+    user_id BIGINT
+    event_id BIGINT
+    description BIGINT
+    timestamp Timestamp
+    }
 
 
 Ref: "Users"."id" < "Events"."initiator_id"
@@ -62,3 +70,7 @@ Ref: "Events"."id" < "Participation"."event_id"
 Ref: "Events"."id" < "Comp_events"."event_id"
 
 Ref: "Compilation"."id" < "Comp_events"."comp_id"
+
+Ref: "Users"."id" < "Comments"."user_id"
+
+Ref: "Events"."id" < "Comments"."event_id"

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.Comments.Comment;
 import ru.practicum.ewm.Comments.CommentsRepository;
@@ -204,12 +205,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие не найдено"));
-        if (event.getState() == State.PUBLISHED) {
-            Comment comment = commentMaper.toComment(commentDto);
-            return commentMaper.toCommentDto(commentsRepository.save(comment));
-        } else {
+        if (event.getState() != State.PUBLISHED) {
             throw new ValidateException("Нельзя комментировать неопубликованные события");
         }
+        Comment comment = commentMaper.toComment(commentDto);
+        comment.setUser(user);
+        comment.setEvent(event);
+        return commentMaper.toCommentDto(commentsRepository.save(comment));
     }
 
     @Override
@@ -222,9 +224,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CommentDto updateComment(int commentId, CommentDto commentDto) {
-        Comment comment = commentsRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
+    public CommentDto updateComment(int commentId, int userId, int eventId, CommentDto commentDto) {
+        Comment comment = commentsRepository.findById(commentId).orElse(new Comment());
+        //   .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
+        if (comment.getUser() != null && !comment.getUser().equals(user)) {
+            throw new ValidateException("Редактирование комментариев доступно только отправителю");
+        }
+        comment.setId(commentId);
+        comment.setEvent(event);
+        comment.setUser(user);
         Comment commentToUpdate = commentMaper.toComment(commentDto);
         comment.setTimestamp(LocalDateTime.now());
         comment.setDescription(commentToUpdate.getDescription());
@@ -232,11 +244,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<CommentDto> getAllCommentsByEvents(int eventId) {
+    public List<CommentDto> getAllCommentsByEvents(int eventId, String sort) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие не найдено"));
         return commentMaper
-                .toListCommentDto(commentsRepository.findAllByEventOrderByTimestamp(event));
+                .toListCommentDto(commentsRepository.findAllByEvent(event, Sort.by(sort)));
     }
 
     @Override
@@ -245,5 +257,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         return commentMaper
                 .toListCommentDto(commentsRepository.findAllByUserOrderByTimestamp(user));
+    }
+
+    @Override
+    public CommentDto getCommentById(int commentId) {
+        Comment comment = commentsRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Коммент не найден"));
+        return commentMaper.toCommentDto(comment);
     }
 }

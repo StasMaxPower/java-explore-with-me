@@ -120,9 +120,9 @@ public class UserController {
     }
 
     //Добавление комментария
-    @PostMapping("/comments/{userId}/{eventId}")
-    public CommentDto addComments(@PathVariable int userId,
-                                  @PathVariable int eventId,
+    @PostMapping("/comments")
+    public CommentDto addComments(@RequestParam int userId,
+                                  @RequestParam int eventId,
                                   @RequestBody CommentDto commentDto) {
         log.info("Запрос на добавление комментария получен, ID={}", userId);
         return userService.addComment(eventId, userId, commentDto);
@@ -136,15 +136,24 @@ public class UserController {
 
     @PatchMapping("/comments/{commentId}")
     public CommentDto updateComments(@PathVariable int commentId,
+                                     @RequestParam int userId,
+                                     @RequestParam int eventId,
                                      @RequestBody CommentDto commentDto) {
         log.info("Запрос на редактирование комментария получен, ID={}", commentId);
-        return userService.updateComment(commentId, commentDto);
+        return userService.updateComment(commentId, userId, eventId, commentDto);
     }
 
-    @GetMapping("/comments/{eventId}")
-    public List<CommentDto> getAllCommentsByEvent(@PathVariable int eventId) {
+    @GetMapping("/comments/{commentId}")
+    public CommentDto getCommentById(@PathVariable int commentId) {
+        log.info("Запрос на вывод комментария с ID получен, ID={}", commentId);
+        return userService.getCommentById(commentId);
+    }
+
+    @GetMapping("/comments/event/{eventId}")
+    public List<CommentDto> getAllCommentsByEvent(@PathVariable int eventId,
+                                                  @RequestParam(required = false, defaultValue = "timestamp") String sort) {
         log.info("Запрос на вывод комментариев к событию с ID получен, ID={}", eventId);
-        return userService.getAllCommentsByEvents(eventId);
+        return userService.getAllCommentsByEvents(eventId, sort);
     }
 
     @GetMapping("/comments")

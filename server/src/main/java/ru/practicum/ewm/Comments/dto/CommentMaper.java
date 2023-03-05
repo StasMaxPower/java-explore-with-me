@@ -10,8 +10,8 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {Utils.class})
 public interface CommentMaper {
 
-    @Mapping(target = "user", expression="java(comment.getUser().getId())")
-    @Mapping(target = "event", expression="java(comment.getEvent().getId())")
+    @Mapping(target = "user", expression = "java(comment.getUser().getId())")
+    @Mapping(target = "event", expression = "java(comment.getEvent().getId())")
     CommentDto toCommentDto(Comment comment);
 
     Comment toComment(CommentDto commentDto);

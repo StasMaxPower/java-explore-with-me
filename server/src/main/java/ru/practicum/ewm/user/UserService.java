@@ -37,9 +37,11 @@ public interface UserService {
 
     void deleteComment(int commentId);
 
-    CommentDto updateComment(int commentId, CommentDto commentDto);
+    CommentDto updateComment(int commentId, int userId, int eventId, CommentDto commentDto);
 
-    List<CommentDto> getAllCommentsByEvents(int eventId);
+    List<CommentDto> getAllCommentsByEvents(int eventId, String sort);
 
     List<CommentDto> getAllCommentsByUser(int userId);
+
+    CommentDto getCommentById(int commentId);
 }

@@ -48,7 +48,20 @@ public class EventServiceImpl implements EventService {
         }
         Pageable pageable = PageRequest.of(from, size);
         text = "%" + text + "%";
-        List<Event> events = eventRepository.getEvents(text, categories, paid, start, end, pageable).stream().collect(Collectors.toList());
+        List<Event> events = eventRepository.getEvents(text, categories, paid, start, end, pageable)
+                .stream()
+                .collect(Collectors.toList());
+/*        events.forEach(event -> {
+            ResponseEntity<List<ViewStats>> resp = eventClient.getStats(start, end,
+                    "/events/" + event.getId());
+            List<ViewStats> viewStats = resp.getBody();
+            Optional<ViewStats> views = viewStats.stream()
+                    .filter(viewStats1 -> viewStats1.getUri().equals(request.getRequestURI()))
+                    .findFirst();
+            int view;
+            view = views.map(ViewStats::getHits).orElse(0);
+            event.setViews(view);
+        });*/
         if (onlyAvailable) {
             events = events.stream()
                     .filter(event -> event.getConfirmedRequests() < event.getParticipantLimit())

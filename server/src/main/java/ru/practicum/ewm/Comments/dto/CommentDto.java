@@ -2,8 +2,6 @@ package ru.practicum.ewm.Comments.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.ewm.events.Event;
-import ru.practicum.ewm.user.User;
 
 import java.time.LocalDateTime;
 
